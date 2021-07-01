@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using dnccon.Client.Services;
+using dnccon.Client.Services.Contracts;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
-using System.IO;
 
 namespace dnccon.Client
 {
@@ -10,7 +12,6 @@ namespace dnccon.Client
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
 
             var builder = new ConfigurationBuilder();
             BuildConfiguration(builder);
@@ -27,12 +28,17 @@ namespace dnccon.Client
             // Hosting Application in Console.
 
             var host = Host.CreateDefaultBuilder()
+
                 .ConfigureServices((context, services) =>
                 {
-
+                    services.AddTransient<IGreetingService, GreetingService>();
                 })
                 .UseSerilog()
                 .Build();
+
+            var services = ActivatorUtilities.CreateInstance<GreetingService>(host.Services);
+
+            services.Run();
                 
         }
 
